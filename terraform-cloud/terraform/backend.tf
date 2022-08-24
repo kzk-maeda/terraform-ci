@@ -1,8 +1,10 @@
 terraform {
-  backend "s3" {
-    bucket = "kzk-sandbox-terraform-tfstate"
-    key    = ".tfstate/services/terraform-cloud"
-    region = "ap-northeast-1"
+  cloud {
+    hostname = "app.terraform.io"
+    organization = "kzk-maeda"
+    workspaces {
+      name = "terraform-cloud-sample"
+    }
   }
 }
 
