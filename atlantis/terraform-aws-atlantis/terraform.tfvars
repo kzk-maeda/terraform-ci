@@ -30,3 +30,9 @@ tags = {
   Name = "atlantis"
   Env = "atlantis"
 }
+
+policies_arn = [
+    # Terraformを実行するため、
+    # AdministratorAccessをAtlantisのECSのタスク実行ロールにアタッチ
+    "arn:aws:iam::aws:policy/AdministratorAccess"
+  ]
