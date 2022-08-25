@@ -12,6 +12,7 @@ projects:
     enabled: true
   apply_requirements: [mergeable, approved]
   workflow: sample-workflow
+  allowed_overrides: [workflow]
 workflows:
   sample-workflow:
     plan:
