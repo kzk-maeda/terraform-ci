@@ -1,0 +1,30 @@
+version: 3
+automerge: false
+delete_source_branch_on_merge: true
+projects:
+- name: atlantis-sample
+  dir: atlantis/atlantis-sample
+  workspace: sample
+  terraform_version: v1.2.7
+  delete_source_branch_on_merge: true
+  autoplan:
+    when_modified: ["*.tf", "../modules/**/*.tf"]
+    enabled: true
+  apply_requirements: [mergeable, approved]
+  workflow: sample-workflow
+workflows:
+  sample-workflow:
+    plan:
+      steps:
+      - run: echo start
+      - init
+      - plan:
+          extra_args: ["-lock", "false"]
+      - run: echo end
+    apply:
+      steps:
+      - run: echo start
+      - apply
+allowed_regexp_prefixes:
+- dev/
+- staging/
