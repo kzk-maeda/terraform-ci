@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket = "terraform-ci-test-backet-terraform-cloud-kzkmaeda"
+  bucket = "terraform-ci-test-backet-atlantis-kzkmaeda"
 
   tags = {
-    Name        = "terraform-ci-test-backet-terraform-cloud-kzkmaeda"
-    Environment = "changed2"
+    Name        = "terraform-ci-test-backet-atlantis-kzkmaeda"
+    Environment = "tag"
   }
 }
 
