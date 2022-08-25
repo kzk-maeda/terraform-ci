@@ -4,7 +4,7 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
-atlantis/terraform-aws-atlantis/terraform.tfvars
+atlantis/terraform-aws-atlantis/secret.tfvars
 
 # Crash log files
 crash.log
