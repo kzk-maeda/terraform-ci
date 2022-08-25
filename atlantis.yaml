@@ -1,13 +1,11 @@
 version: 3
-automerge: false
-delete_source_branch_on_merge: true
+automerge: true
 projects:
 # 開発環境の設定
 - name: atlantis-sample
   dir: atlantis/atlantis-sample
   workspace: default
   terraform_version: v1.2.7
-  delete_source_branch_on_merge: true
   autoplan:
     # 指定したファイルが変更されたら
     # 自動でplanを実行して結果をGitHubのコメントで追加
