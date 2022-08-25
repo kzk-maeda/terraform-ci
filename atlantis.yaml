@@ -11,6 +11,3 @@ projects:
     # 自動でplanを実行して結果をGitHubのコメントで追加
     when_modified: ["*.tf", "../../modules/**/*.tf"]
     enabled: true
-allowed_regexp_prefixes:
-- dev/
-- staging/
