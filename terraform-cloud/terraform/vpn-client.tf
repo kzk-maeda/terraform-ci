@@ -38,6 +38,12 @@ resource "aws_ec2_client_vpn_authorization_rule" "private_1c" {
   authorize_all_groups   = true
 }
 
+resource "aws_ec2_client_vpn_authorization_rule" "private_1c" {
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
+  target_network_cidr    = "0.0.0.0/0"
+  authorize_all_groups   = true
+}
+
 # Route Table to allow Internet access
 resource "aws_ec2_client_vpn_route" "private_1a" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
