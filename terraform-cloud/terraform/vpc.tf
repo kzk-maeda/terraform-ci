@@ -37,7 +37,7 @@ resource "aws_subnet" "private_1a" {
 
   availability_zone = "ap-northeast-1a"
 
-  cidr_block = "10.0.1.0/24"
+  cidr_block = "10.0.3.0/24"
 
   tags = {
     Name = "vpn_client_private_1a"
@@ -49,7 +49,7 @@ resource "aws_subnet" "private_1c" {
 
   availability_zone = "ap-northeast-1c"
 
-  cidr_block = "10.0.2.0/24"
+  cidr_block = "10.0.4.0/24"
 
   tags = {
     Name = "vpn_client_private_1c"
