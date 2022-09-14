@@ -1,8 +1,15 @@
 terraform {
-  backend "s3" {
-    bucket = "kzk-sandbox-terraform-tfstate"
-    key    = "workflow/sample.tfstate"
-    region = "ap-northeast-1"
+  # backend "s3" {
+  #   bucket = "kzk-sandbox-terraform-tfstate"
+  #   key    = "workflow/sample.tfstate"
+  #   region = "ap-northeast-1"
+  # }
+  cloud {
+    hostname = "app.terraform.io"
+    organization = "kzk-maeda"
+    workspaces {
+      tags = ["app:terraform-workspace"]
+    }
   }
 }
 
