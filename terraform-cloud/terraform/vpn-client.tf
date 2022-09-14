@@ -38,7 +38,7 @@ resource "aws_ec2_client_vpn_authorization_rule" "private_1c" {
   authorize_all_groups   = true
 }
 
-resource "aws_ec2_client_vpn_authorization_rule" "private_1c" {
+resource "aws_ec2_client_vpn_authorization_rule" "Internet" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   target_network_cidr    = "0.0.0.0/0"
   authorize_all_groups   = true
