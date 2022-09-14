@@ -7,10 +7,40 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
     root_certificate_chain_arn = data.aws_acm_certificate.client_certificate.arn
   }
   connection_log_options {
-    enabled = false
+    enabled = true
+    cloudwatch_log_group  = aws_cloudwatch_log_group.vpn.name
+    cloudwatch_log_stream = aws_cloudwatch_log_stream.vpn.name
   }
   tags = {
     Name = "vpn_endpoint"
+  }
+}
+
+# security group
+resource "aws_security_group" "this" {
+  name        = "vpn"
+  description = "VPN"
+  vpc_id      = aws_vpc.vpn_client.id
+
+  ingress {
+    description      = "any"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "vpn"
   }
 }
 
@@ -18,11 +48,13 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
 resource "aws_ec2_client_vpn_network_association" "private_1a" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   subnet_id              = aws_subnet.private_1a.id
+  security_groups        = [aws_security_group.this.id]
 }
 
 resource "aws_ec2_client_vpn_network_association" "private_1c" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   subnet_id              = aws_subnet.private_1c.id
+  security_groups        = [aws_security_group.this.id]
 }
 
 # Authorize
