@@ -26,15 +26,9 @@ resource "aws_ec2_client_vpn_network_association" "private_1c" {
 }
 
 # Authorize
-resource "aws_ec2_client_vpn_authorization_rule" "private_1a" {
+resource "aws_ec2_client_vpn_authorization_rule" "vpc" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  target_network_cidr    = aws_subnet.private_1a.cidr_block
-  authorize_all_groups   = true
-}
-
-resource "aws_ec2_client_vpn_authorization_rule" "private_1c" {
-  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  target_network_cidr    = aws_subnet.private_1c.cidr_block
+  target_network_cidr    = aws_vpc.vpn_client.cidr_block
   authorize_all_groups   = true
 }
 
