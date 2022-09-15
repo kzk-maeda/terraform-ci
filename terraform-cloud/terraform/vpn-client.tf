@@ -2,6 +2,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
   description            = "kzk client vpn endpoint test"
   server_certificate_arn = data.aws_acm_certificate.server_certificate.arn
   client_cidr_block      = var.vpn_client_cidr_blocks
+  dns_servers            = ["10.0.0.2", "8.8.8.8"]
   authentication_options {
     type                       = "certificate-authentication"
     root_certificate_chain_arn = data.aws_acm_certificate.client_certificate.arn
