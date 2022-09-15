@@ -7,7 +7,7 @@ resource "aws_ec2_client_vpn_endpoint" "this" {
     root_certificate_chain_arn = data.aws_acm_certificate.client_certificate.arn
   }
   connection_log_options {
-    enabled = true
+    enabled               = true
     cloudwatch_log_group  = aws_cloudwatch_log_group.vpn.name
     cloudwatch_log_stream = aws_cloudwatch_log_stream.vpn.name
   }
