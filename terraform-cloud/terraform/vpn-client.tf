@@ -24,11 +24,11 @@ resource "aws_security_group" "this" {
   vpc_id      = aws_vpc.vpn_client.id
 
   ingress {
-    description      = "any"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = [aws_vpc.vpn_client.cidr_block]
+    description = "any"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.vpn_client.cidr_block]
   }
 
   egress {
@@ -45,15 +45,11 @@ resource "aws_security_group" "this" {
 }
 
 # Association
-resource "aws_ec2_client_vpn_network_association" "private_1a" {
-  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  subnet_id              = aws_subnet.private_1a.id
-  security_groups        = [aws_security_group.this.id]
-}
+resource "aws_ec2_client_vpn_network_association" "private" {
+  for_each = aws_subnet.private
 
-resource "aws_ec2_client_vpn_network_association" "private_1c" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  subnet_id              = aws_subnet.private_1c.id
+  subnet_id              = each.value.id
   security_groups        = [aws_security_group.this.id]
 }
 
@@ -71,14 +67,10 @@ resource "aws_ec2_client_vpn_authorization_rule" "Internet" {
 }
 
 # Route Table to allow Internet access
-resource "aws_ec2_client_vpn_route" "private_1a" {
-  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
-  destination_cidr_block = "0.0.0.0/0"
-  target_vpc_subnet_id   = aws_ec2_client_vpn_network_association.private_1a.subnet_id
-}
+resource "aws_ec2_client_vpn_route" "private" {
+  for_each = aws_ec2_client_vpn_network_association.private
 
-resource "aws_ec2_client_vpn_route" "private_1c" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.this.id
   destination_cidr_block = "0.0.0.0/0"
-  target_vpc_subnet_id   = aws_ec2_client_vpn_network_association.private_1c.subnet_id
+  target_vpc_subnet_id   = each.value.subnet_id
 }
