@@ -1,6 +1,6 @@
 ### VPC
 resource "aws_vpc" "vpn_client" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
 
@@ -10,53 +10,30 @@ resource "aws_vpc" "vpn_client" {
 }
 
 ### Subnet
-resource "aws_subnet" "public_1a" {
-  vpc_id = aws_vpc.vpn_client.id
+resource "aws_subnet" "public" {
+  for_each = var.public_subnet_cidr_blocks
 
-  availability_zone = "ap-northeast-1a"
-
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.vpn_client.id
+  availability_zone = each.key
+  cidr_block        = each.value.cidr_block
 
   tags = {
-    Name = "vpn_client_public_1a"
+    Name = "vpn_client_public_${each.value.name}"
   }
 }
 
-resource "aws_subnet" "public_1c" {
-  vpc_id = aws_vpc.vpn_client.id
+resource "aws_subnet" "private" {
+  for_each = var.private_subnet_cidr_blocks
 
-  availability_zone = "ap-northeast-1c"
-
-  cidr_block = "10.0.2.0/24"
+  vpc_id            = aws_vpc.vpn_client.id
+  availability_zone = each.key
+  cidr_block        = each.value.cidr_block
 
   tags = {
-    Name = "vpn_client_public_1c"
+    Name = "vpn_client_private_${each.value.name}"
   }
 }
 
-resource "aws_subnet" "private_1a" {
-  vpc_id = aws_vpc.vpn_client.id
-
-  availability_zone = "ap-northeast-1a"
-
-  cidr_block = "10.0.3.0/24"
-
-  tags = {
-    Name = "vpn_client_private_1a"
-  }
-}
-
-resource "aws_subnet" "private_1c" {
-  vpc_id = aws_vpc.vpn_client.id
-
-  availability_zone = "ap-northeast-1c"
-
-  cidr_block = "10.0.4.0/24"
-
-  tags = {
-    Name = "vpn_client_private_1c"
-  }
-}
 
 ### IGW
 resource "aws_internet_gateway" "vpn_client" {
@@ -68,39 +45,27 @@ resource "aws_internet_gateway" "vpn_client" {
 }
 
 ### NGW
-resource "aws_eip" "nat_1a" {
+resource "aws_eip" "nat" {
+  for_each = var.public_subnet_cidr_blocks
+
   vpc = true
 
   tags = {
-    Name = "vpn_client-natgw-1a"
+    Name = "vpn_client-natgw-${each.value.name}"
   }
 }
 
-resource "aws_nat_gateway" "nat_1a" {
-  subnet_id     = aws_subnet.public_1a.id
-  allocation_id = aws_eip.nat_1a.id
+resource "aws_nat_gateway" "nat" {
+  for_each = var.public_subnet_cidr_blocks
+
+  subnet_id     = aws_subnet.private[each.key].id
+  allocation_id = aws_eip.nat[each.key].id
 
   tags = {
-    Name = "vpn_client-1a"
+    Name = "vpn_client-${each.value.name}"
   }
 }
 
-resource "aws_eip" "nat_1c" {
-  vpc = true
-
-  tags = {
-    Name = "vpn_client-natgw-1c"
-  }
-}
-
-resource "aws_nat_gateway" "nat_1c" {
-  subnet_id     = aws_subnet.public_1c.id
-  allocation_id = aws_eip.nat_1c.id
-
-  tags = {
-    Name = "vpn_client-1c"
-  }
-}
 
 ### Route Table
 #### Public
@@ -118,51 +83,35 @@ resource "aws_route" "public" {
   gateway_id             = aws_internet_gateway.vpn_client.id
 }
 
-resource "aws_route_table_association" "public_1a" {
-  subnet_id      = aws_subnet.public_1a.id
-  route_table_id = aws_route_table.public.id
-}
+resource "aws_route_table_association" "public" {
+  for_each = aws_subnet.public
 
-resource "aws_route_table_association" "public_1c" {
-  subnet_id      = aws_subnet.public_1c.id
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.public.id
 }
 
 #### Private
-resource "aws_route_table" "private_1a" {
+resource "aws_route_table" "private" {
+  for_each = var.private_subnet_cidr_blocks
+
   vpc_id = aws_vpc.vpn_client.id
 
   tags = {
-    Name = "vpn_client-private-1a"
+    Name = "vpn_client-private-${each.value.name}"
   }
 }
 
-resource "aws_route_table" "private_1c" {
-  vpc_id = aws_vpc.vpn_client.id
+resource "aws_route" "private" {
+  for_each = var.private_subnet_cidr_blocks
 
-  tags = {
-    Name = "vpn_client-private-1c"
-  }
-}
-
-resource "aws_route" "private_1a" {
   destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.private_1a.id
-  nat_gateway_id         = aws_nat_gateway.nat_1a.id
-}
-
-resource "aws_route" "private_1c" {
-  destination_cidr_block = "0.0.0.0/0"
-  route_table_id         = aws_route_table.private_1c.id
-  nat_gateway_id         = aws_nat_gateway.nat_1c.id
+  route_table_id         = aws_route_table.private[each.key].id
+  nat_gateway_id         = aws_nat_gateway.nat[each.key].id
 }
 
 resource "aws_route_table_association" "private_1a" {
-  subnet_id      = aws_subnet.private_1a.id
-  route_table_id = aws_route_table.private_1a.id
-}
+  for_each = var.private_subnet_cidr_blocks
 
-resource "aws_route_table_association" "private_1c" {
-  subnet_id      = aws_subnet.private_1c.id
-  route_table_id = aws_route_table.private_1c.id
+  subnet_id      = aws_subnet.private[each.key].id
+  route_table_id = aws_route_table.private[each.key].id
 }
