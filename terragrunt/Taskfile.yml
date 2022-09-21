@@ -1,0 +1,23 @@
+version: 3
+
+tasks:
+  show: 
+  - terraform workspace show
+
+  dev:
+  - terraform workspace select dev
+
+  plan-dev:
+  - terraform plan -var-file ./env/`terraform workspace show`/terraform.tfvars
+
+  apply-dev:
+  - terraform apply -var-file ./env/`terraform workspace show`/terraform.tfvars
+
+  prod:
+  - terraform workspace select prod
+
+  plan-prod:
+  - terraform plan -var-file ./env/`terraform workspace show`/terraform.tfvars
+
+  apply-prod:
+  - terraform apply -var-file ./env/`terraform workspace show`/terraform.tfvars
