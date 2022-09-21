@@ -31,3 +31,4 @@ override.tf.json
 
 .aws
 state_backup.json
+secret.tfvars
